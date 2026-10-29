@@ -1,0 +1,451 @@
+{
+  "name": "Etapa 1 · flujo principal",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "b2ddcc48-8cad-5a3a-bde5-e8b8d6c7912c",
+      "name": "Al ejecutar el flujo",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"pedido_web\": \"WEB-20260323-0117\",\n  \"cliente_id\": \"C014\",\n  \"partidas\": [\n    {\n      \"clave\": \"ROD-6205-2RS\",\n      \"cantidad\": 4\n    },\n    {\n      \"clave\": \"BAN-A42\",\n      \"cantidad\": 6\n    },\n    {\n      \"clave\": \"SEL-35X52X7\",\n      \"cantidad\": 2\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "6d6f384f-d6d7-534d-9459-21e24be6cbc4",
+      "name": "Pedido de prueba",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "etapa1-pedido",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson",
+        "options": {}
+      },
+      "id": "6085b999-2cc1-5099-89f5-acf372005c37",
+      "name": "Pedido del portal",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        200
+      ],
+      "webhookId": "499e735e-8c06-5596-94b7-9d1c4fae28fb",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "20a2e145-5221-55f0-a6a1-709c37824d9e",
+              "name": "pedido_web",
+              "type": "string",
+              "value": "={{ $json.body.pedido_web }}"
+            },
+            {
+              "id": "bb870233-f1c4-596b-b2b8-ed1cd4e8884c",
+              "name": "cliente_id",
+              "type": "string",
+              "value": "={{ $json.body.cliente_id }}"
+            },
+            {
+              "id": "d1fb79b7-ad22-5ac9-a1a5-cd351073451f",
+              "name": "partidas",
+              "type": "array",
+              "value": "={{ $json.body.partidas }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2ac28cde-2a4b-599b-aa29-382e70a6a30b",
+      "name": "Pedido recibido",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "reasignar-al-importar",
+          "cachedResultName": "S1 normalizar_pedido"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "pedido_web": "={{ $json.pedido_web }}",
+            "cliente_id": "={{ $json.cliente_id }}",
+            "partidas": "={{ $json.partidas }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "pedido_web",
+              "displayName": "pedido_web",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cliente_id",
+              "displayName": "cliente_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "partidas",
+              "displayName": "partidas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "array",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "e802ae85-81a2-58da-8d4c-62beabae2ee4",
+      "name": "Normalizar pedido (S1)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "reasignar-al-importar",
+          "cachedResultName": "S2 validar_credito"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "cliente_id": "={{ $json.cliente_id }}",
+            "monto_mxn": "={{ $json.monto_mxn }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cliente_id",
+              "displayName": "cliente_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "monto_mxn",
+              "displayName": "monto_mxn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "67343ddc-041f-58aa-a4b5-186ddd808067",
+      "name": "Validar crédito (S2)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "reasignar-al-importar",
+          "cachedResultName": "S3 registrar_en_erp"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "cliente_id": "={{ $('Normalizar pedido (S1)').item.json.cliente_id }}",
+            "partidas": "={{ $('Normalizar pedido (S1)').item.json.partidas }}",
+            "monto_mxn": "={{ $('Normalizar pedido (S1)').item.json.monto_mxn }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cliente_id",
+              "displayName": "cliente_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "partidas",
+              "displayName": "partidas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "array",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "monto_mxn",
+              "displayName": "monto_mxn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "846a60c5-fdd0-5819-927a-e2e69f3aac2a",
+      "name": "Registrar en el ERP (S3)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "reasignar-al-importar",
+          "cachedResultName": "S4 confirmar_pedido"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "cliente_id": "={{ $('Normalizar pedido (S1)').item.json.cliente_id }}",
+            "folio": "={{ $json.folio }}",
+            "aprobado": "={{ $('Validar crédito (S2)').item.json.aprobado }}",
+            "motivo": "={{ $('Validar crédito (S2)').item.json.motivo }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cliente_id",
+              "displayName": "cliente_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "folio",
+              "displayName": "folio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "aprobado",
+              "displayName": "aprobado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "motivo",
+              "displayName": "motivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "31d50644-d924-5bc0-bb03-c8321449ce5d",
+      "name": "Confirmar al cliente (S4)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Etapa 1 · flujo principal\n**Dueño:** el integrador. Llama a los cuatro subflujos en orden, por su **nombre**. Cada integrante construye el suyo en su n8n; el integrador los importa aquí con la libreta `protocolo-equipo.ipynb`.\n\nCambia el **Pedido de prueba** para probar otros casos: un monto que rebase el crédito, una clave que no exista, el ERP caído.\n\nMientras S1 no devuelva sus `partidas` y su `monto_mxn`, el ERP rechaza el pedido en S3 (422: no cumple su contrato). Mientras S2 no devuelva `aprobado`, el flujo se detiene al llamar a S4: su contrato pide un verdadero o falso, no un campo vacío.\n\n**Dos disparadores:** «Al ejecutar el flujo» es el que usa el botón **Execute workflow** para probar en el editor. «Pedido del portal» (webhook) viene **desactivado**, para que ese botón no se quede esperando una llamada: cuando vayas a publicar el flujo, selecciónalo y pulsa **D** para activarlo. El flujo de error que elijas en Settings **solo corre en ejecuciones automáticas**, no al probar a mano.",
+        "width": 560,
+        "height": 560,
+        "color": 4
+      },
+      "id": "05fe4883-22c1-5c13-a1a3-6fb8062f5010",
+      "name": "Nota 82b1ee",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -600
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Lo que construye el equipo aquí:**\n- La **ramificación** después de S2: un pedido turnado a crédito no se registra en el ERP.\n- La **ruta de error** de S3: qué pasa con el pedido cuando el ERP no responde después de los reintentos.\n- Que S4 reciba el caso correcto en los tres caminos.",
+        "width": 460,
+        "height": 220,
+        "color": 7
+      },
+      "id": "9c0d0a7d-f022-579e-9737-3143ed2612d7",
+      "name": "Nota 0365c6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        700,
+        180
+      ]
+    }
+  ],
+  "connections": {
+    "Al ejecutar el flujo": {
+      "main": [
+        [
+          {
+            "node": "Pedido de prueba",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedido de prueba": {
+      "main": [
+        [
+          {
+            "node": "Normalizar pedido (S1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar pedido (S1)": {
+      "main": [
+        [
+          {
+            "node": "Validar crédito (S2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar crédito (S2)": {
+      "main": [
+        [
+          {
+            "node": "Registrar en el ERP (S3)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar en el ERP (S3)": {
+      "main": [
+        [
+          {
+            "node": "Confirmar al cliente (S4)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedido del portal": {
+      "main": [
+        [
+          {
+            "node": "Pedido recibido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedido recibido": {
+      "main": [
+        [
+          {
+            "node": "Normalizar pedido (S1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

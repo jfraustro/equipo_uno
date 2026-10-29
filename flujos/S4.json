@@ -1,0 +1,156 @@
+{
+  "name": "S4 confirmar_pedido",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "cliente_id",
+              "type": "string"
+            },
+            {
+              "name": "folio",
+              "type": "string"
+            },
+            {
+              "name": "aprobado",
+              "type": "boolean"
+            },
+            {
+              "name": "motivo",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "be0a424e-cf8b-570a-8bce-5ef7366ba854",
+      "name": "Entrada (contrato)",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=http://erp:8000/erp/clientes/{{ $json.cliente_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "03b266ec-e606-5877-ade4-e4adec498773",
+      "name": "Consultar cliente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": "ERP API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86a26e11-7c3f-52ae-bbe8-d1e658523c12",
+              "name": "para",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "f5efaafe-3303-5dc2-b90d-965f50429cde",
+              "name": "asunto",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "ce3e95b5-8d49-5706-9be5-59c165d04f76",
+              "name": "mensaje",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "id": "e361e521-11e9-52a7-8190-7e6d2aa5b03a",
+      "name": "Salida (contrato)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## S4 confirmar_pedido\n**Dueño:** el integrador (además del principal). Arma la confirmación para el correo de compras del cliente: pedido registrado con su folio, turnado a crédito o no registrado por una falla.\n\n**Entrada:** `cliente_id` (string), `folio` (string), `aprobado` (boolean), `motivo` (string)\n\n**Salida:** `para` (string), `asunto` (string), `mensaje` (string)\n\nLos campos vacíos de «Salida (contrato)» son lo que te toca llenar.\n\n**No cambies el nombre de este flujo ni los campos del contrato** sin acordarlo con tu equipo: el flujo principal los usa.",
+        "width": 520,
+        "height": 340,
+        "color": 4
+      },
+      "id": "9d247e26-346d-5314-b623-d80e632063d8",
+      "name": "Nota dd8edc",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "El correo del cliente está en `correo_compras`. Tres casos: registrado (con folio), turnado a crédito y no registrado por una falla.",
+        "width": 380,
+        "height": 160,
+        "color": 7
+      },
+      "id": "620a0d1b-bc90-56f2-b9ca-03db23216fc8",
+      "name": "Nota 27a4be",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        180
+      ]
+    }
+  ],
+  "connections": {
+    "Entrada (contrato)": {
+      "main": [
+        [
+          {
+            "node": "Consultar cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar cliente": {
+      "main": [
+        [
+          {
+            "node": "Salida (contrato)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

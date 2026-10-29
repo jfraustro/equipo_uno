@@ -1,0 +1,164 @@
+{
+  "name": "S1 normalizar_pedido",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "pedido_web",
+              "type": "string"
+            },
+            {
+              "name": "cliente_id",
+              "type": "string"
+            },
+            {
+              "name": "partidas",
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "id": "14467217-3c9c-576a-b942-28067e79ef3f",
+      "name": "Entrada (contrato)",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=http://erp:8000/erp/catalogo/{{ $json.clave }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "63685a5b-9383-55ec-9567-6712711bb2fe",
+      "name": "Consultar catálogo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": "ERP API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3607c2e1-a20a-50e4-8378-dc211d719c0b",
+              "name": "cliente_id",
+              "type": "string",
+              "value": "={{ $('Entrada (contrato)').first().json.cliente_id }}"
+            },
+            {
+              "id": "db8975c8-2c4d-59f8-8cd7-c959455e05f2",
+              "name": "partidas",
+              "type": "array",
+              "value": "={{ [] }}"
+            },
+            {
+              "id": "c2e796a6-705b-582c-bc8b-50f270f8438d",
+              "name": "monto_mxn",
+              "type": "number",
+              "value": ""
+            },
+            {
+              "id": "54011ba4-b996-5134-9cc8-eed7615c4671",
+              "name": "completo",
+              "type": "boolean",
+              "value": ""
+            },
+            {
+              "id": "9bef6b5e-63eb-5047-bce6-b3fdd868f0aa",
+              "name": "claves_invalidas",
+              "type": "array",
+              "value": "={{ [] }}"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "id": "b93e88c7-c808-5536-a504-abf09ec5919d",
+      "name": "Salida (contrato)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## S1 normalizar_pedido\n**Dueño:** integrante 1. Valida cada partida contra el catálogo del ERP: descripción, precio, importe y si hay existencia. Una clave que no existe no detiene el pedido: va a claves_invalidas.\n\n**Entrada:** `pedido_web` (string), `cliente_id` (string), `partidas` (array)\n\n**Salida:** `cliente_id` (string), `partidas` (array), `monto_mxn` (number), `completo` (boolean), `claves_invalidas` (array)\n\nLos campos vacíos de «Salida (contrato)» son lo que te toca llenar.\n\n**No cambies el nombre de este flujo ni los campos del contrato** sin acordarlo con tu equipo: el flujo principal los usa.",
+        "width": 520,
+        "height": 340,
+        "color": 4
+      },
+      "id": "117a990a-5b0d-5b79-b1c9-62458ce3c198",
+      "name": "Nota 804623",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "El nodo «Consultar catálogo» espera **un ítem por partida** con su `clave`: separa las partidas antes y júntalas después (lo del video de la semana 2). Una clave que no existe hace que el catálogo responda 404: revisa **Settings → On Error** de este nodo para que no detenga el pedido.",
+        "width": 380,
+        "height": 160,
+        "color": 7
+      },
+      "id": "cf919995-94e2-5893-afb8-8284eb342dd5",
+      "name": "Nota 9d7a27",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        180
+      ]
+    }
+  ],
+  "connections": {
+    "Entrada (contrato)": {
+      "main": [
+        [
+          {
+            "node": "Consultar catálogo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar catálogo": {
+      "main": [
+        [
+          {
+            "node": "Salida (contrato)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

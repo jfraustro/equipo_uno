@@ -1,0 +1,154 @@
+{
+  "name": "S2 validar_credito",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "cliente_id",
+              "type": "string"
+            },
+            {
+              "name": "monto_mxn",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "id": "54564001-8f25-5c55-b845-a0047f31fcc1",
+      "name": "Entrada (contrato)",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=http://erp:8000/erp/clientes/{{ $json.cliente_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "79691e5f-4c15-55f1-8f8c-ed5ece81495f",
+      "name": "Consultar cliente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": "ERP API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f15f9cd8-7fbc-5a22-a0af-25c25827bcb2",
+              "name": "aprobado",
+              "type": "boolean",
+              "value": ""
+            },
+            {
+              "id": "ab50b855-c498-55bd-b815-84d0ea198e09",
+              "name": "motivo",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "452eb9a1-4249-56a4-ae26-1b2b6498cf52",
+              "name": "limite_mxn",
+              "type": "number",
+              "value": ""
+            },
+            {
+              "id": "6657ab83-73f5-5e22-8cf0-3473f073b7bf",
+              "name": "saldo_mxn",
+              "type": "number",
+              "value": ""
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "id": "dbf73d17-d2d5-5542-a024-bffe06dac95f",
+      "name": "Salida (contrato)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## S2 validar_credito\n**Dueño:** integrante 2. Regla de crédito: un cliente de contado siempre pasa; uno a crédito pasa si saldo + monto no rebasa su límite. Si lo rebasa, no se rechaza: se turna a Ramón (aprobado = falso y el motivo lo dice).\n\n**Entrada:** `cliente_id` (string), `monto_mxn` (number)\n\n**Salida:** `aprobado` (boolean), `motivo` (string), `limite_mxn` (number), `saldo_mxn` (number)\n\nLos campos vacíos de «Salida (contrato)» son lo que te toca llenar.\n\n**No cambies el nombre de este flujo ni los campos del contrato** sin acordarlo con tu equipo: el flujo principal los usa.",
+        "width": 520,
+        "height": 340,
+        "color": 4
+      },
+      "id": "f9c14c74-72a0-5e83-938c-ec1b647e78ba",
+      "name": "Nota ac0c99",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "El ERP devuelve `condicion_pago`, `limite_credito_mxn` y `saldo_mxn`. El monto viene de la entrada: `$('Entrada (contrato)').item.json.monto_mxn`.",
+        "width": 380,
+        "height": 160,
+        "color": 7
+      },
+      "id": "f21f2fc4-8d38-5d31-9092-c6e8ab182367",
+      "name": "Nota 15c957",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        180
+      ]
+    }
+  ],
+  "connections": {
+    "Entrada (contrato)": {
+      "main": [
+        [
+          {
+            "node": "Consultar cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar cliente": {
+      "main": [
+        [
+          {
+            "node": "Salida (contrato)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

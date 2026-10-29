@@ -37,13 +37,21 @@ tiene asignado.
 ## Dónde clonarlo
 
 Con GitHub Desktop o con `git clone`, **clónalo dentro de la carpeta `equipo/` del repositorio del entorno**. Así lo
-ve JupyterLab y puedes abrir `protocolo-equipo.ipynb`. La carpeta `equipo/` ya está en el
-`.gitignore` del entorno: no se mezclan los dos repositorios.
+ve JupyterLab y puedes abrir `protocolo-equipo.ipynb`. La carpeta `equipo/` ya viene en el repositorio del
+entorno, y su contenido está en el `.gitignore` del entorno: no se mezclan los dos repositorios.
+
+**Git corre en tu computadora; la libreta, en el JupyterLab del entorno** (<http://localhost:8888>), que
+corre dentro de Docker junto a tu n8n. Los dos ven la misma carpeta: lo que la libreta exporta aparece en
+GitHub Desktop o en `git status` sin que lo copies.
 
 ## El protocolo
 
 1. **Pull** (GitHub Desktop, o `git pull`): trae lo último del equipo.
-2. En JupyterLab, abre `protocolo-equipo.ipynb` y **Run → Run All Cells**. **La primera vez te pregunta tu
+2. En el **JupyterLab del entorno** (<http://localhost:8888>), entra a `equipo/`, a la carpeta de este
+   repositorio, y abre `protocolo-equipo.ipynb`. Tiene que ser ese JupyterLab, no VS Code ni un Jupyter
+   instalado en tu computadora: ya trae lo que la libreta necesita, así que no instalas nada ni creas ningún
+   ambiente de Python, y desde otro lado la libreta no encuentra tu n8n ni su llave (termina con
+   `FileNotFoundError: … '/config/n8n-api-key'`). **Run → Run All Cells**. **La primera vez te pregunta tu
    papel y tu subflujo** y lo guarda en `mi-papel.json`, que es solo tuyo y no se sube a Git. Importa en tu
    n8n lo de tus compañeros, exporta lo tuyo a `flujos/` y verifica las referencias.
 3. **Commit** y **Push** de tu archivo. **No subas la libreta**: es de todo el equipo, y

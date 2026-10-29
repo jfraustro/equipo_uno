@@ -1,0 +1,156 @@
+{
+  "name": "S3 registrar_en_erp",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "cliente_id",
+              "type": "string"
+            },
+            {
+              "name": "partidas",
+              "type": "array"
+            },
+            {
+              "name": "monto_mxn",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "id": "956b033d-d1e7-5bb2-95a4-3b98821a0898",
+      "name": "Entrada (contrato)",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://erp:8000/erp/orders",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { cliente_id: $json.cliente_id, partidas: $json.partidas, monto_mxn: $json.monto_mxn } }}",
+        "options": {}
+      },
+      "id": "a5ad3729-a120-547f-ab89-55494c6c0b3e",
+      "name": "Crear pedido en el ERP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": null,
+          "name": "ERP OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e20f6921-2a26-5da5-8b15-ae0205c780b6",
+              "name": "folio",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "0227e04c-eef9-5299-b887-f6db9bf4ba37",
+              "name": "registrado",
+              "type": "boolean",
+              "value": ""
+            },
+            {
+              "id": "cc419ec0-7631-5b68-b6c4-22febde848ca",
+              "name": "error",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "id": "bd52ba0c-8f8a-598f-8711-e287c333dfd7",
+      "name": "Salida (contrato)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## S3 registrar_en_erp\n**Dueño:** integrante 3. Registra el pedido en el ERP. Es el paso que falla: el ERP puede responder 503 o tardar. Decide qué se reintenta y qué hace el flujo cuando ya no hay reintentos.\n\n**Entrada:** `cliente_id` (string), `partidas` (array), `monto_mxn` (number)\n\n**Salida:** `folio` (string), `registrado` (boolean), `error` (string)\n\nLos campos vacíos de «Salida (contrato)» son lo que te toca llenar.\n\n**No cambies el nombre de este flujo ni los campos del contrato** sin acordarlo con tu equipo: el flujo principal los usa.",
+        "width": 520,
+        "height": 340,
+        "color": 4
+      },
+      "id": "0fd119e3-3851-5add-9ce4-da45b19a3cf6",
+      "name": "Nota cdf96b",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "El ERP responde con `order_id` (tu folio). Revisa en la configuración del nodo **Settings → Retry On Fail** y **On Error**. Prueba con la página de estado: «Simular que el ERP se cae».",
+        "width": 380,
+        "height": 160,
+        "color": 7
+      },
+      "id": "91f46317-eeaf-5448-a22b-20ff4ade29c1",
+      "name": "Nota d29cc9",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        180
+      ]
+    }
+  ],
+  "connections": {
+    "Entrada (contrato)": {
+      "main": [
+        [
+          {
+            "node": "Crear pedido en el ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear pedido en el ERP": {
+      "main": [
+        [
+          {
+            "node": "Salida (contrato)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
