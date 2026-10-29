@@ -1,0 +1,12 @@
+# Secretos y configuración local: nunca al repositorio
+.env
+*.key
+*api-key*
+credenciales*.json
+# Tu papel y tu subflujo: solo tuyos, para que la libreta compartida no cambie
+mi-papel.json
+# Python y Jupyter
+__pycache__/
+.ipynb_checkpoints/
+# El registro de tu servicio del Lab 3 (lo escribe la libreta al arrancarlo)
+servicio.log
